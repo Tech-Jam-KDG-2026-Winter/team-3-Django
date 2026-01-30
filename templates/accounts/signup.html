@@ -1,0 +1,18 @@
+<h1>新規登録</h1>
+
+{% if form.errors %}
+<ul style="color: red">
+	{% for field in form %} {% for error in field.errors %}
+	<li>{{ error }}</li>
+	{% endfor %} {% endfor %}
+</ul>
+{% endif %}
+
+<form method="post">
+	{% csrf_token %}
+	<p>ユーザー名：{{ form.username }}</p>
+	<p>年齢：{{ form.age }}</p>
+	<p>パスワード：{{ form.password1 }}</p>
+	<p>パスワード（確認）：{{ form.password2 }}</p>
+	<button type="submit">登録</button>
+</form>
