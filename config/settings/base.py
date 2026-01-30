@@ -16,6 +16,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "accounts",
+    "challenge",
 
     # starter apps
     "apps.common",
@@ -33,10 +34,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "config.urls"
 
+# 各appフォルダ内でのtemplates管理が出来なかったため 'APP_DIRS': True, を追加しました。
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
         "DIRS": [BASE_DIR / "templates"],
+        'APP_DIRS': True,
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.request",

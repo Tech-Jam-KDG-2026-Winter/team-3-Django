@@ -1,0 +1,60 @@
+
+<form method="POST" id="per-form">
+    {% csrf_token %}
+
+    <!-- menu -->
+    <input type="text" name="menu" placeholder="メニュー名" value="ラジオ体操" required>
+
+    <!-- level -->
+    <select name="level" required>
+        <option value="STORONG">強</option>
+        <option value="MIDIUN">中</option>
+        <option value="SOFT">弱</option>
+        <option value="CUSTOM">カスタム</option>
+    </select>
+
+    <!-- time -->
+    <input id="time" type="text" value="0.0" name="time" readonly>
+
+    <!-- result -->
+    <select name="result" required>
+        <option value="PERFECT">完遂</option>
+        <option value="GOOD">5割</option>
+        <option value="FAILED">失敗</option>
+    </select>
+
+</form>
+
+<button type="button" id="btn-stop">運動を終わる</button>
+
+<style>
+    #btn-stop{
+        height: 30px;
+    }
+</style>
+
+<script>
+    const startTime = performance.now();
+    let timerInterval = null;
+
+    const display = document.getElementById("time");
+    const stopBtn = document.getElementById("btn-stop");
+
+    timerInterval = setInterval(() => {
+        const now = performance.now();
+        const elapsedSeconds = (now - startTime) / 1000;
+        display.value = elapsedSeconds.toFixed(1);
+    }, 100);
+
+    stopBtn.addEventListener("click", () => {
+    clearInterval(timerInterval);
+
+    const endTime = performance.now();
+    const totalSeconds = (endTime - startTime) / 1000;
+
+    display.value = totalSeconds.toFixed(1);
+    console.log("経過時間:", totalSeconds.toFixed(1));
+
+    document.getElementById("per-form").submit();
+});
+</script>
