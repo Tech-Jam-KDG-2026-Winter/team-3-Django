@@ -1,0 +1,52 @@
+{% load static %}
+
+{% if data.timelimit_seconds != 0 %}
+    <button id="btn-start" type="button" class="active">START!</button>
+    <span id="time"></span>
+{% else %}
+    <button id="btn-start" type="button" class="">失敗</button>
+    <span id="time">0.0</span>
+{% endif %}
+
+<form id="failForm" action="" method="POST" style="display:none;">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="start">
+</form>
+
+{{ data|json_script:"data" }}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        window.data = JSON.parse(document.getElementById("data").textContent);
+        let time = window.data.timelimit_seconds;
+        const btnStart = document.getElementById("btn-start");
+        const displayTimer = document.getElementById("time");
+
+        if (time > 0) {
+    
+            function updateTimer() {
+                displayTimer.textContent = time.toFixed(1);
+                if (time <= 0) {
+                    clearInterval(timerInterval);
+                    displayTimer.textContent = "0.0";
+                    btnStart.classList.remove("active");
+                    btnStart.textContent = "失敗";
+                } else {
+                    time -= 0.1;
+                }
+            }
+            updateTimer();
+            const timerInterval = setInterval(updateTimer, 100);
+    
+        };
+        btnStart.addEventListener("click", (e) => {
+            console.log(btnStart);
+            if (btnStart.classList.contains("active")) {
+                const form = document.getElementById("failForm");
+                form.action = window.data.next_success;
+                form.submit();
+            } else {
+                window.location.href = window.data.next_failed;
+            }
+        });
+    });
+</script>
