@@ -10,6 +10,7 @@ urlpatterns = [
         "",
         include(("accounts.urls", "accounts"), namespace="accounts"),
     ),
+    path("custom/", include("custom.urls")),
     path(
         "challenge/",include(("challenge.urls")),
     ),
