@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>カスタムメニュー</title>
+</head>
+<body>
+
+<h1>セットメニュー作成</h1>
+<div class="form-wrapper">
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+    
+        <table id="menu-table">
+            <thead>
+                <tr>
+                    <th>曜日</th>
+                    <th>メニュー</th>
+                    <th>強度</th>
+                    <th>開始時間</th>
+                    <th></th>
+                </tr>
+            </thead>
+    
+            <tbody>
+                {% for weekday, form in rows %}
+                    <tr class="form-row" data-weekday="{{ weekday.0 }}">
+                        <td class="weekday-cell">
+                            {{ weekday.1 }}
+                        </td>
+                        <td>{{ form.menu }}</td>
+                        <td>{{ form.level }}</td>
+                        <td>{{ form.starttime }}</td>
+                    </tr>
+                {% endfor %}
+                
+            </tbody>
+        </table>
+    
+        <div class="button-wrapper">
+            <button type="submit">保存</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('click', function (e) {
+    
+        /* 追加 */
+        if (e.target.classList.contains('add-row-btn')) {
+            const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+            const currentRow = e.target.closest('.form-row');
+            const newRow = currentRow.cloneNode(true);
+    
+            const formIndex = parseInt(totalForms.value);
+    
+            newRow.querySelectorAll('input, select').forEach(el => {
+                el.name = el.name.replace(/-\d+-/, `-${formIndex}-`);
+                el.id = el.id.replace(/-\d+-/, `-${formIndex}-`);
+
+                if (el.type !== 'hidden') {
+                    el.value = '';
+                }
+            });
+    
+            currentRow.after(newRow);
+            totalForms.value = formIndex + 1;
+    
+            updateWeekdayLabels();
+        }
+    
+        /* 削除（曜日ごとに最低1行） */
+        if (e.target.classList.contains('delete-row-btn')) {
+            const currentRow = e.target.closest('.form-row');
+            const weekday = currentRow.dataset.weekday;
+    
+            const sameDayRows = document.querySelectorAll(
+                `.form-row[data-weekday="${weekday}"]`
+            );
+    
+            if (sameDayRows.length <= 1) {
+                alert('この曜日は最低1つ必要です');
+                return;
+            }
+    
+            currentRow.remove();
+    
+            const rows = document.querySelectorAll('.form-row');
+            rows.forEach((row, index) => {
+                row.querySelectorAll('input, select').forEach(el => {
+                    el.name = el.name.replace(/-\d+-/, `-${index}-`);
+                    el.id = el.id.replace(/-\d+-/, `-${index}-`);
+                });
+            });
+    
+            document.getElementById('id_form-TOTAL_FORMS').value = rows.length;
+    
+            updateWeekdayLabels();
+        }
+    });
+    
+    function updateWeekdayLabels() {
+        const rows = document.querySelectorAll('.form-row');
+        const seen = {};
+    
+        rows.forEach(row => {
+            const weekday = row.dataset.weekday;
+            const cell = row.querySelector('.weekday-cell');
+    
+            if (seen[weekday]) {
+                cell.textContent = '';
+            } else {
+                seen[weekday] = true;
+            }
+        });
+    }
+    
+    document.addEventListener('DOMContentLoaded', function () {
+        updateWeekdayLabels();
+    });
+    
+    </script>
+    
+    
+    <style>
+    .form-wrapper,h1 {
+        display: flex;
+        justify-content: center;
+        }
+    .button-wrapper {
+        display: flex;
+        justify-content: center;
+        margin: 24px;
+    }
+    .button-wrapper button{
+        font-size: 1.3rem;
+        font-weight: bold;
+        padding: 0.25em 0.5em;
+        margin: auto;
+        border-radius: 60px;
+        cursor: pointer;
+        width: auto;
+    }
+    .button-wrapper button:hover {
+    color: #fff;
+    background-color: #333;
+    }
+    .button-wrapper button:active {
+        color: #aaa;
+        background-color: #555;
+    }
+</style>
+</body>
+</html>
